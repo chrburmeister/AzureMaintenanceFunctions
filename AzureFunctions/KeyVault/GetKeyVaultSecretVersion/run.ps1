@@ -1,13 +1,16 @@
 <#
     .SYNOPSIS
-        Recieve all secrets from a specific Azure Key Vault
+        Recieve all secret verions from a specific Azure Key Vault
     .DESCRIPTION
         Recieve all secrets from a specific Azure Key Vault
     .PARAMETER vaultName
         Specifies the name of the Azure Key Vault you wnat to recieve secrets from.
         Mandatory
+    .PARAMETER secretName
+        Specifies the name of the Azure Key Vault secret you wnat to recieve all versions from.
+        Mandatory
     .EXAMPLE
-        Invoke-RestMethod -Method Get -Uri 'https://<functionName>.azurewebsites.net/api/GetVaultSecrets?vaultName=[vaultName]code=[token]'
+        Invoke-RestMethod -Method Get -Uri 'https://<functionName>.azurewebsites.net/api/GetVaultSecrets?vaultName=[vaultName]&secretName=[secretName]&code=[token]'
 #>
 
 using namespace System.Net
@@ -15,6 +18,7 @@ using namespace System.Net
 param($Request, $TriggerMetadata)
 
 $vaultName = $Request.Query.vaultName
+$secretName = $Request.Query.secretName
 
 # Acquire Access Token
 $apiVersion = '2017-09-01'
@@ -24,11 +28,11 @@ $tokenResponse = Invoke-RestMethod -Method Get -Headers @{"Secret" = "$env:MSI_S
 $authHeader = @{Authorization = "Bearer $($tokenResponse.access_token)" }
 
 $param = @{
-    'Uri'         = "https://$vaultName.vault.azure.net/secrets?api-version=7.0"
+    'Uri'         = "https://$vaultName.vault.azure.net/secrets/$secretName/versions?api-version=7.0"
     'Method'      = 'Get'
     'Header'      = $authHeader
     'ErrorAction' = 'Stop'
-    'ContentType' = 'application/json'
+    'ContentType' = 'application/josn'
 }
 
 try {
@@ -41,17 +45,7 @@ try {
     }
 }
 
-[System.Collections.ArrayList]$arr = @()
-if ($status -eq 200) {
-    foreach ($secret in $($response.Value)) {
-        $name = $secret.id -replace "https://$vaultName.vault.azure.net/secrets/"
-
-        Add-Member -MemberType NoteProperty -Name 'Name' -Value $name -InputObject $secret
-        $arr.Add($secret) | Out-Null
-    }
-}
-
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = $status
-        Body       = (Convertto-json -inputObject $arr -depth 10 -compress)
+        Body       = (Convertto-json -inputObject $($response.value) -depth 10 -compress)
     })
