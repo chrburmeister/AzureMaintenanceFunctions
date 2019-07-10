@@ -1,8 +1,8 @@
 <#
     .SYNOPSIS
-        Recieve all secrets from a specific Azure Key Vault
+        Recieve all secrets from a specific Azure Key Vault.
     .DESCRIPTION
-        Recieve all secrets from a specific Azure Key Vault
+        Recieve all secrets from a specific Azure Key Vault.
     .PARAMETER vaultName
         Specifies the name of the Azure Key Vault you wnat to recieve secrets from.
         Mandatory

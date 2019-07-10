@@ -1,18 +1,17 @@
 <#
     .SYNOPSIS
-        Recieve all secret verions from a specific Azure Key Vault
+        Creates or updates a secret in the specified Azure Key Vault.
     .DESCRIPTION
-        Recieve all secrets from a specific Azure Key Vault
+        Creates or updates a secret in the specified Azure Key Vault.
     .PARAMETER vaultName
-        Specifies the name of the Azure Key Vault you wnat to recieve secrets from.
+        Specifies the name of the Azure Key Vault you wnat to create or update a secret in.
         Mandatory
     .PARAMETER secretName
-        Specifies the name of the Azure Key Vault secret you wnat to recieve.
+        Specifies the name of the Azure Key Vault secret you wnat to create or update.
         Mandatory
     .PARAMETER secretValue
-        Specifies the version of the Azure Key Vault secret you wnat to recieve.
-        If you don't add this, the current version will be recieved.
-        Optional
+        Specifies the secret value
+        Mandatory
     .EXAMPLE
         $param = @{
             "secretValue" = "secretValue",
@@ -20,7 +19,7 @@
             "secretName"  = "secretName"
         }
 
-        Invoke-RestMethod -Method Get -Uri 'https://<functionName>.azurewebsites.net/api/GetVaultSecrets?code=[token]' -Body (ConvertTo-Json -InputObject $param)
+        Invoke-RestMethod -Method Post -Uri 'https://<functionName>.azurewebsites.net/api/GetVaultSecrets?code=[token]' -Body (ConvertTo-Json -InputObject $param)
 #>
 
 using namespace System.Net
