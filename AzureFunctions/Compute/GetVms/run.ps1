@@ -4,7 +4,7 @@
     .DESCRIPTION
         Recieve all virtual machines in a subscription.
     .PARAMETER subscriptionId
-        Specifies the name of the Azure Key Vault you wnat to recieve secrets from.
+        Specifies the Id of the Azure Subsciption you wnat to recieve all virtual machines from.
         Mandatory
     .EXAMPLE
         Invoke-RestMethod -Method Get -Uri 'https://<functionName>.azurewebsites.net/api/GetVms?subscriptionId=[subscriptionId]&code=[token]'
