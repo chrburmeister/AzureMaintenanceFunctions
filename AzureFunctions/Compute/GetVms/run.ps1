@@ -6,6 +6,9 @@
     .PARAMETER subscriptionId
         Specifies the Id of the Azure Subsciption you wnat to recieve all virtual machines from.
         Mandatory
+    .PARAMETER resourceGroup
+        Specifies the name of the Resource Group within the Azure subscription you wnat to recieve all virtual machines from.
+        Optional
     .EXAMPLE
         Invoke-RestMethod -Method Get -Uri 'https://<functionName>.azurewebsites.net/api/GetVms?subscriptionId=[subscriptionId]&code=[token]'
 #>
@@ -20,8 +23,14 @@ $tokenAuthURI = $env:MSI_ENDPOINT + "?resource=$resourceURI&api-version=$apiVers
 $tokenResponse = Invoke-RestMethod -Method Get -Headers @{"Secret" = "$env:MSI_SECRET" } -Uri $tokenAuthURI
 $authHeader = @{Authorization = "Bearer $($tokenResponse.access_token)" }
 
+if($($Request.Query.resourceGroup)){
+    $uri = "https://management.azure.com/subscriptions/$($Request.Query.subscriptionId)/resourceGroups/$($Request.Query.resourceGroup)/providers/Microsoft.Compute/virtualMachines?api-version=2018-06-01"
+} else {
+    $uri = "https://management.azure.com/subscriptions/$($Request.Query.subscriptionId)/providers/Microsoft.Compute/virtualMachines?api-version=2018-06-01"
+}
+
 $param = @{
-    'Uri'         = "https://management.azure.com/subscriptions/$($Request.Query.subscriptionId)/providers/Microsoft.Compute/virtualMachines?api-version=2018-06-01"
+    'Uri'         = $uri
     'Method'      = 'Get'
     'Header'      = $authHeader
     'ErrorAction' = 'Stop'
